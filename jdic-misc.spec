@@ -21,6 +21,7 @@ Source1:	Makefile.jdic-misc
 BuildRequires:	jpackage-utils
 BuildRequires:	ant
 BuildRequires:	pkgconfig(x11)
+BuildRequires:	pkgconfig(xv)
 BuildRequires:	pkgconfig(xt)
 
 Requires:	jpackage-utils
