@@ -1,0 +1,79 @@
+#
+# Copyright (C) 2004 Sun Microsystems, Inc. All rights reserved. Use is
+# subject to license terms.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the Lesser GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA.
+# 
+
+# 
+# Makefile for building JDIC native libraries(*.so) on Unix platforms
+# (Linux/Solaris/FreeBSD).
+# *** This makefile must be built using GNU Make ***
+# JAVA_HOME must be set before using this script.
+#
+
+UNAME = $(shell uname)
+ARCH = $(shell uname -m)
+
+PLATFORM = linux
+CXX += $(CC)
+CXXFLAGS += -c -fPIC
+LDFLAGS += -Wl,-z,relro -shared -fPIC -ldl -lrt -lpthread -ljawt -lXv
+
+USR_INCLUDE_DIR = /usr/include
+ifeq ($(ARCH), x86_64)
+  USR_LIB_DIR = /usr/lib64
+  SO_NAME=libjdic_misc-64.so
+  LDFLAGS += -L$(JAVA_HOME)/jre/lib/amd64
+else
+  USR_LIB_DIR = /usr/lib
+  SO_NAME=libjdic_misc-32.so
+  LDFLAGS += -L$(JAVA_HOME)/jre/lib/i386
+endif
+
+INCLUDES = -I$(JAVA_HOME)/include \
+           -I$(JAVA_HOME)/include/$(PLATFORM)
+
+TRAY_LIBS = -L$(X11LIB) -lXt -lX11
+
+#
+# All the native source files.
+#
+TRAY_CSRC = alerter.c
+
+#
+# Build both libjdic.so and ibtray.so containing all the native code.
+#
+TRAY_SO_NAME = libjdic_misc.so
+
+all: $(TRAY_SO_NAME)
+
+JDIC_SO_OBJS = $(CPPSRCS:.cpp=.o)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(EXTRA_INCLUDES) -o $@ $<
+
+#
+# Build libtray.so containing only the Tray Icon API native code.
+#
+tray: $(TRAY_SO_NAME)
+
+$(TRAY_SO_NAME): $(TRAY_CSRC)
+	$(CC) $(INCLUDES) $(LDFLAGS) -ldl -L$(X11LIB) -lXt -lX11 $(TRAY_CSRC) -o $(SO_NAME)
+
+clean:
+	rm -f *.so
+	rm -f *.o

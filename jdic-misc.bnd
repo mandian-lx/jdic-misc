@@ -1,0 +1,9 @@
+Bundle-Name:         jdic-misc
+Bundle-Version:      @VERSION@
+Bundle-License:      https://opensource.org/licenses/LGPL-2.1
+Bundle-Description:  The JDesktop Integration Components (JDIC) - misc inbubator
+Bundle-Vendor:       http://javadesktop.org/articles/jdic/index.html#jdic
+Bundle-DocURL:       https://jdic.dev.java.net/nonav/documentation/javadoc/jdic/index.html
+Specification-Title: jdic-misc
+Specification-Version: @VERSION@
+

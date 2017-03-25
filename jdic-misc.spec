@@ -17,9 +17,11 @@ URL:		http://javadesktop.org/articles/jdic/index.html#jdic
 Source0:	%{name}-%{version}.tar.xz
 # Adapted from https://svn.java.net/svn/jdic~svn/trunk/src/incubator/tray/src/unix/native/jni/Makefile
 Source1:	Makefile.jdic-misc
+Source2:	%{name}.bnd
 
 BuildRequires:	jpackage-utils
 BuildRequires:	ant
+BuildRequires:	aqute-bnd
 BuildRequires:	pkgconfig(x11)
 BuildRequires:	pkgconfig(xv)
 BuildRequires:	pkgconfig(xt)
@@ -74,6 +76,12 @@ find . -name "*.so" -delete
 
 cp %{SOURCE1} src/linux/native/jni/Makefile
 
+# .bnd
+cp %{SOURCE2} %{name}.bnd
+
+# fix version in manifest
+sed -i -e "s|@VERSION@|%{version}|g" %{name}.bnd
+
 # Fix paths
 sed -i -e '{
 	     s|\${src.dir}/unix|\${src.dir}/linux|g
@@ -85,7 +93,11 @@ export ANT_OPTS="-Dfile.encoding=ISO-8859-1 -Dtarget.version=1.7 -Dtarget.source
 %setup_compile_flags
 %ant buildall
 
-# add the index to the jars
+# add OSGi manifest
+java -jar $(build-classpath aqute-bnd) wrap -properties %{name}.bnd dist/linux/%{libname}.jar
+mv %{libname}.bar dist/linux/%{libname}.jar
+
+# add index
 %jar i dist/linux/%{libname}.jar
 
 %install
